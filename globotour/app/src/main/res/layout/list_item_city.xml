@@ -42,27 +42,31 @@
 
         <ImageView
             android:id="@+id/imv_delete"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:layout_margin="7dp"
             android:contentDescription="@string/delete_icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imv_city"
+            android:padding="10dp"
             app:srcCompat="@drawable/ic_delete"
+            android:scaleType="fitCenter"
             app:tint="#9e9e9e" />
 
         <ImageView
             android:id="@+id/imv_favorite"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:layout_margin="7dp"
             android:layout_marginEnd="10dp"
+            android:padding="10dp"
             android:contentDescription="@string/favorite_icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/imv_delete"
             app:layout_constraintTop_toBottomOf="@+id/imv_city"
             app:srcCompat="@drawable/ic_favorite_bordered"
+            android:scaleType="fitCenter"
             app:tint="#9e9e9e" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

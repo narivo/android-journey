@@ -57,7 +57,12 @@ class CityAdapter(val context: Context, val cityList: ArrayList<City>,
         }
 
         private fun deleteItem() {
+            val deletedCity = cityList[currentPosition]
             cityList.removeAt(currentPosition)
+
+            val favoritePos = VacationSpots.favoriteCityList.indexOf(deletedCity)
+            VacationSpots.favoriteCityList.removeAt(favoritePos)
+
             notifyItemRemoved(currentPosition)
             notifyItemRangeChanged(currentPosition, cityList.size)
         }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
+<!--<androidx.drawerlayout.widget.DrawerLayout-->
+<androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,8 +10,10 @@
     <!-- Main Content (Drawer will slide over this) -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:layout_height="0dp"
+        android:fitsSystemWindows="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_view">
 
         <com.google.android.material.appbar.AppBarLayout
             style="@style/Widget.MaterialComponents.AppBarLayout.PrimarySurface"
@@ -23,8 +26,8 @@
                 style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways"
-                android:elevation="4dp" />
+                android:elevation="4dp"
+                app:layout_scrollFlags="scroll|enterAlways" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -39,12 +42,22 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigation_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        app:headerLayout="@layout/nav_header"
-        app:menu="@menu/activity_main_drawer_items"
-        android:layout_gravity="start"/>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/activity_main_drawer_items" />
 
-</androidx.drawerlayout.widget.DrawerLayout>
+<!--    <com.google.android.material.navigation.NavigationView-->
+<!--        android:id="@+id/navigation_view"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:headerLayout="@layout/nav_header"-->
+<!--        app:menu="@menu/activity_main_drawer_items"-->
+<!--        android:layout_gravity="start"/>-->
+
+<!--</androidx.drawerlayout.widget.DrawerLayout>-->
+</androidx.constraintlayout.widget.ConstraintLayout>
