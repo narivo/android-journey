@@ -1,0 +1,2 @@
+rootProject.name = "Kotlin Custom Views"
+include ':app'
