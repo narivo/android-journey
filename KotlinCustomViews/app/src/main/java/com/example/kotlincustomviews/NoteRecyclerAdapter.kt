@@ -26,11 +26,13 @@ class NoteRecyclerAdapter(val context: Context) : RecyclerView.Adapter<NoteRecyc
         holder.textCourse.text = note.course?.title
         holder.textTitle.text = note.title
         holder.currentPosition = position
+        holder.noteColor.setBackgroundColor(note.color)
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textCourse: TextView = itemView.findViewById<TextView>(R.id.textCourse)
         val textTitle: TextView = itemView.findViewById<TextView>(R.id.textTitle)
+        val noteColor: View = itemView.findViewById(R.id.noteColor)
         var currentPosition = 0;
 
         init {

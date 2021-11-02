@@ -1,5 +1,6 @@
 package com.example.kotlincustomviews
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -37,6 +38,12 @@ class NoteActivity : AppCompatActivity() {
             DataManager.notes.add(NoteInfo())
             notePosition = DataManager.notes.lastIndex
         }
+
+        /*colorSelector.addListener { color ->
+            val note = DataManager.notes[notePosition]
+            note.color = color
+
+        }*/
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -48,6 +55,10 @@ class NoteActivity : AppCompatActivity() {
         val note = DataManager.notes[notePosition]
         textNoteTitle.setText(note.title)
         textNoteText.setText(note.text)
+
+        if(note.color != Color.TRANSPARENT) {
+            //colorSelector.currentColor = note.color
+        }
 
         val coursePosition = DataManager.courses.values.indexOf(note.course)
         spinnerCourses.setSelection(coursePosition)
