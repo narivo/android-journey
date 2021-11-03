@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.item_note.*
 
 class NoteActivity : AppCompatActivity() {
     private var notePosition = POSITION_NOT_SET
@@ -44,6 +45,11 @@ class NoteActivity : AppCompatActivity() {
             note.color = color
 
         }*/
+
+        colorSlider.addListener {
+            val note = DataManager.notes[notePosition]
+            note.color = it
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -57,7 +63,7 @@ class NoteActivity : AppCompatActivity() {
         textNoteText.setText(note.text)
 
         if(note.color != Color.TRANSPARENT) {
-            //colorSelector.currentColor = note.color
+            colorSlider.selectedColorValue = note.color
         }
 
         val coursePosition = DataManager.courses.values.indexOf(note.course)
