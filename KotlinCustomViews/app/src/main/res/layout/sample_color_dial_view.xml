@@ -6,7 +6,8 @@
     <com.example.kotlincustomviews.ColorDialView
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:paddingLeft="20dp"
-        android:paddingBottom="40dp"/>
+        android:paddingStart="50dp"
+        android:paddingTop="40dp"
+        android:paddingBottom="40dp" />
 
 </FrameLayout>
