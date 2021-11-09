@@ -4,10 +4,15 @@
     android:layout_height="match_parent">
 
     <com.example.kotlincustomviews.ColorDialView
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:paddingStart="50dp"
-        android:paddingTop="40dp"
-        android:paddingBottom="40dp" />
+        android:layout_width="127dp"
+        android:layout_height="136dp"
+        android:paddingStart="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        app:colors="@array/note_color_array"
+        app:dialDiameter="100dp"
+        app:scaleToFit="true"
+        app:tickPadding="30dp"
+        app:tickRadius="10dp" />
 
 </FrameLayout>
