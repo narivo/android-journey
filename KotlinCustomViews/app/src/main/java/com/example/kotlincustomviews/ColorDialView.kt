@@ -8,17 +8,21 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
+import android.view.MotionEvent
+import android.view.MotionEvent.*
 import android.view.View
 import androidx.core.content.ContextCompat
+import kotlin.math.roundToInt
 
 /**
  * TODO: document your custom view class.
  */
-class ColorDialView @JvmOverloads constructor(context: Context,
-                                              attrs: AttributeSet? = null,
-                                              defStyleAttr: Int = 0,
-                                              defStyleRes: Int = 0)
-    : View(context, attrs, defStyleAttr, defStyleRes) {
+class ColorDialView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0
+) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private var colors: ArrayList<Int> = arrayListOf(Color.RED, Color.YELLOW,
         Color.BLUE, Color.GREEN, Color.DKGRAY, Color.CYAN, Color.MAGENTA,
@@ -26,7 +30,7 @@ class ColorDialView @JvmOverloads constructor(context: Context,
 
     private var noColorDrawable: Drawable? = null
     private var dialDrawable: Drawable? = null
-    private val paint = Paint().also{
+    private val paint = Paint().also {
         it.color = Color.BLUE
         it.isAntiAlias = true
 
@@ -55,6 +59,24 @@ class ColorDialView @JvmOverloads constructor(context: Context,
     private var centerHorizontal = 0f
     private var centerVertical = 0f
 
+    //View interaction values
+    private var dragStartX = 0f
+    private var dragStartY = 0f
+    private var dragging = false
+    private var snapAngle = 0f
+    private var selectedPosition = 0
+
+    // added
+    var selectedColorValue: Int = Color.TRANSPARENT
+        set(value) {
+            val selectedColorIndex = colors.indexOf(value)
+            if (selectedColorIndex != -1) {
+                snapAngle = selectedColorIndex * angleBetweenColors
+                selectedPosition = selectedColorIndex
+                invalidate()
+            }
+        }
+
     init {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ColorDialView)
         try {
@@ -67,10 +89,12 @@ class ColorDialView @JvmOverloads constructor(context: Context,
                 colors = customColors
 
             }
-            dialDiameter =  typedArray.getDimension(R.styleable.ColorDialView_dialDiameter, toPX(100).toFloat()).toInt()
-            extraPadding =  typedArray.getDimension(R.styleable.ColorDialView_tickPadding, toPX(30).toFloat()).toInt()
-            tickSize =  typedArray.getDimension(R.styleable.ColorDialView_tickRadius, toPX(10).toFloat())
-            scaleToFit =  typedArray.getBoolean(R.styleable.ColorDialView_scaleToFit, false)
+            dialDiameter = typedArray.getDimension(R.styleable.ColorDialView_dialDiameter, toPX(100).toFloat())
+                .toInt()
+            extraPadding = typedArray.getDimension(R.styleable.ColorDialView_tickPadding, toPX(30).toFloat())
+                .toInt()
+            tickSize = typedArray.getDimension(R.styleable.ColorDialView_tickRadius, toPX(10).toFloat())
+            scaleToFit = typedArray.getBoolean(R.styleable.ColorDialView_scaleToFit, false)
         } finally {
             typedArray.recycle()
         }
@@ -82,7 +106,7 @@ class ColorDialView @JvmOverloads constructor(context: Context,
             it?.bounds = getCenteredBounds(tickSize.toInt(), 2f)
         }
         colors.add(0, Color.TRANSPARENT)
-        angleBetweenColors = 360f/ colors.size
+        angleBetweenColors = 360f / colors.size
         refreshValues(true)
     }
 
@@ -96,12 +120,12 @@ class ColorDialView @JvmOverloads constructor(context: Context,
         this.totalBottomPadding = paddingBottom + extraPadding * localScale
 
         //Compute helper values
-        this.horizontalSize = paddingLeft + paddingRight + (extraPadding  * localScale * 2) + dialDiameter * localScale
-        this.verticalSize = paddingTop + paddingBottom + (extraPadding  * localScale * 2) + dialDiameter * localScale
+        this.horizontalSize = paddingLeft + paddingRight + (extraPadding * localScale * 2) + dialDiameter * localScale
+        this.verticalSize = paddingTop + paddingBottom + (extraPadding * localScale * 2) + dialDiameter * localScale
 
         // Compute position values
         this.tickPositionVertical = paddingTop + extraPadding * localScale / 2f
-        this.centerHorizontal = totalLeftPadding + (horizontalSize - totalLeftPadding - totalRightPadding)  / 2f
+        this.centerHorizontal = totalLeftPadding + (horizontalSize - totalLeftPadding - totalRightPadding) / 2f
         this.centerVertical = totalTopPadding + (verticalSize - totalTopPadding - totalBottomPadding) / 2f
         tickSizeScaled = tickSize * scale
     }
@@ -155,7 +179,7 @@ class ColorDialView @JvmOverloads constructor(context: Context,
             canvas.rotate(angleBetweenColors, centerHorizontal, centerVertical)
         }
         canvas.restoreToCount(saveCount)
-
+        canvas.rotate(snapAngle, centerHorizontal, centerVertical)
         canvas.translate(centerHorizontal, centerVertical)
         dialDrawable?.draw(canvas)
     }
@@ -163,6 +187,67 @@ class ColorDialView @JvmOverloads constructor(context: Context,
     private fun getCenteredBounds(size: Int, scalar: Float = 1f): Rect {
         val half = ((if (size > 0) size / 2 else 1) * scalar).toInt()
         return Rect(-half, -half, half, half)
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        dragStartX = event.x
+        dragStartY = event.y
+
+        if (event.action == ACTION_DOWN || event.action == ACTION_MOVE) {
+            dragging = true
+
+            // figure out snap angle
+            if (getSnapAngle(dragStartX, dragStartY)) {
+                listeners.forEach { function ->
+                    if (selectedPosition > colors.size - 1) {
+                        function(colors[0])
+                    } else {
+                        function(colors[selectedPosition])
+                    }
+
+                }
+                invalidate()
+            }
+        }
+        if (event.action == ACTION_UP) {
+            dragging = false
+        }
+        return true
+    }
+
+    private fun getSnapAngle(x: Float, y: Float): Boolean {
+        var dragAngle = cartesianToPolar(x - horizontalSize / 2, (verticalSize - y) - verticalSize / 2)
+        val nearest = (getNearestAngle(dragAngle) / angleBetweenColors).roundToInt()
+        val newAngle = nearest * angleBetweenColors
+        var shouldUpdate = false
+        if (newAngle != snapAngle) {
+            shouldUpdate = true
+            selectedPosition = nearest
+        }
+        snapAngle = newAngle
+        return shouldUpdate
+    }
+
+    private fun getNearestAngle(dragAngle: Float): Float {
+        var adjustedAngle = (360 - dragAngle) + 90
+        while (adjustedAngle > 360) adjustedAngle -= 360
+        return adjustedAngle
+    }
+
+    private fun cartesianToPolar(x: Float, y: Float): Float {
+        val angle = Math.toDegrees((Math.atan2(y.toDouble(), x.toDouble()))).toFloat()
+
+        return when (angle) {
+            in 0f..180f -> angle
+            in -180f..0f -> angle + 360f
+            else -> angle
+        }
+    }
+
+    private var listeners: ArrayList<(Int) -> Unit> = arrayListOf()
+
+    fun addListener(listener: ((Int) -> Unit)) {
+        listeners.add(listener)
     }
 
     private fun toPX(value: Int): Int {

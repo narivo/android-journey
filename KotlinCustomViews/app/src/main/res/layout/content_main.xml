@@ -61,16 +61,26 @@
 <!--        app:layout_constraintStart_toStartOf="parent"-->
 <!--        app:layout_constraintTop_toBottomOf="@id/colorSelectorLabel" />-->
 
-    <com.example.kotlincustomviews.ColorSlider
-        android:id="@+id/colorSlider"
-        android:layout_width="0dp"
+<!--    <com.example.kotlincustomviews.ColorSlider-->
+<!--        android:id="@+id/colorSlider"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        android:layout_marginEnd="20dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        app:colors="@array/note_color_array"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/colorSelectorLabel"/>-->
+
+    <com.example.kotlincustomviews.ColorDialView
+        android:id="@+id/colorDial"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="16dp"
-        app:colors="@array/note_color_array"
+        app:colors="@array/note_color_array_many"
+        app:dialDiameter="200dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/colorSelectorLabel"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

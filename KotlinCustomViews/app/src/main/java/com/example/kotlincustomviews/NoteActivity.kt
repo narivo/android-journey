@@ -7,10 +7,8 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.item_note.*
 
 class NoteActivity : AppCompatActivity() {
     private var notePosition = POSITION_NOT_SET
@@ -46,7 +44,13 @@ class NoteActivity : AppCompatActivity() {
 
         }*/
 
-        colorSlider.addListener {
+        /*colorSlider.addListener {
+            val note = DataManager.notes[notePosition]
+            note.color = it
+        }*/
+
+        colorDial.addListener {
+
             val note = DataManager.notes[notePosition]
             note.color = it
         }
@@ -63,7 +67,8 @@ class NoteActivity : AppCompatActivity() {
         textNoteText.setText(note.text)
 
         if(note.color != Color.TRANSPARENT) {
-            colorSlider.selectedColorValue = note.color
+            //colorSlider.selectedColorValue = note.color
+            colorDial.selectedColorValue = note.color
         }
 
         val coursePosition = DataManager.courses.values.indexOf(note.course)
