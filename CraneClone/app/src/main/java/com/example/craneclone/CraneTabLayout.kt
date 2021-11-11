@@ -6,7 +6,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.Path
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -19,12 +19,10 @@ class CraneTabLayout @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : TabLayout(context, attrs, defStyleAttr) {
 
-    var newLeft = 0f
-    var newTop = 0f
-    var newRight = 0f
-    var newBottom = 0f
-
-    var tabRect: RectF = RectF()
+    var left = 0f
+    var top = 0f
+    var right = 0f
+    var bottom = 0f
 
     var oldLeft = 0f
     var oldRight = 0f
@@ -46,21 +44,21 @@ class CraneTabLayout @JvmOverloads constructor(
 
                 val animatorSet = AnimatorSet()
 
-                Log.d("CraneTabLayout", "new right $newRight")
+                Log.d("CraneTabLayout", "new right $right")
 
-                var leftAnimator = ValueAnimator.ofFloat(oldLeft, newLeft).apply {
+                var leftAnimator = ValueAnimator.ofFloat(oldLeft, left).apply {
                     interpolator = AccelerateDecelerateInterpolator()
                     duration = 250L
                     addUpdateListener {
-                        tabRect.left = it.animatedValue as Float
+                        left = it.animatedValue as Float
                         invalidate()
                     }
                 }
-                var rightAnimator = ValueAnimator.ofFloat(oldRight, newRight).apply {
+                var rightAnimator = ValueAnimator.ofFloat(oldRight, right).apply {
                     interpolator = AccelerateDecelerateInterpolator()
                     duration = 250L
                     addUpdateListener {
-                        tabRect.right = it.animatedValue as Float
+                        right = it.animatedValue as Float
                     }
                 }
 
@@ -86,22 +84,21 @@ class CraneTabLayout @JvmOverloads constructor(
         val tabWidth = width / tabCount
         val fourthTabWidth = tabWidth * 1/4
 
-        oldLeft = tabRect.left
-        oldRight = tabRect.right
+        oldLeft = left
+        oldRight = right
 
-        newLeft = getTabAt(selectedTabPosition)?.view?.left?.toFloat() ?: 0f
-        newTop = getTabAt(selectedTabPosition)?.view?.top?.toFloat() ?: 0f
-        newRight = getTabAt(selectedTabPosition)?.view?.right?.toFloat() ?: 0f
-        newBottom = getTabAt(selectedTabPosition)?.view?.bottom?.toFloat() ?: 0f
+        left = getTabAt(selectedTabPosition)?.view?.left?.toFloat() ?: 0f
+        top = getTabAt(selectedTabPosition)?.view?.top?.toFloat() ?: 0f
+        right = getTabAt(selectedTabPosition)?.view?.right?.toFloat() ?: 0f
+        bottom = getTabAt(selectedTabPosition)?.view?.bottom?.toFloat() ?: 0f
 
-        Log.d("CraneTabLayout", "#updateTabOutline new right $newRight")
+        Log.d("CraneTabLayout", "#updateTabOutline new right $right")
         
-        newLeft = newLeft * 3/4 + newRight * 1/4
-        newTop = newTop * 3/4 + newBottom * 1/4
-        newRight -= fourthTabWidth
-        newBottom = newBottom * 3/4
+        left = left * 3/4 + right * 1/4
+        top = top * 3/4 + bottom * 1/4
+        right -= fourthTabWidth
+        bottom = bottom * 3/4
 
-        tabRect = RectF(newLeft, newTop, newRight, newBottom)
     }
 
     init {
@@ -115,7 +112,8 @@ class CraneTabLayout @JvmOverloads constructor(
             updateTabOutline()
             firstLaunch = false
         }
-        canvas.drawRect(tabRect, indicatorPaint)
+        //canvas.drawRect(tabRect, indicatorPaint)
+        canvas.drawRoundedRect(left, top, right, bottom, toPX(10).toFloat(), toPX(10).toFloat(), indicatorPaint)
     }
 
     private fun toPX(value: Int): Int {
@@ -123,4 +121,40 @@ class CraneTabLayout @JvmOverloads constructor(
             value.toFloat(),
             context.resources.displayMetrics).toInt()
     }
+}
+
+fun Canvas.drawRoundedRect(left: Float, top: Float, right: Float, bottom: Float, rx: Float, ry: Float, paint: Paint) {
+    val path = roundedRect(left, top, right, bottom, rx, ry, false)
+    this.drawPath(path, paint)
+}
+
+private fun Canvas.roundedRect(left: Float, top: Float, right: Float, bottom: Float, rx: Float, ry: Float, conformToOriginalPost: Boolean): Path {
+    var rx = rx
+    var ry = ry
+    val path = Path()
+    if (rx < 0) rx = 0f
+    if (ry < 0) ry = 0f
+    val width = right - left
+    val height = bottom - top
+    if (rx > width / 2) rx = width / 2
+    if (ry > height / 2) ry = height / 2
+    val widthMinusCorners = width - 2 * rx
+    val heightMinusCorners = height - 2 * ry
+    path.moveTo(right, top + ry)
+    path.arcTo(right - 2 * rx, top, right, top + 2 * ry, 0f, -90f, false) //top-right-corner
+    path.rLineTo(-widthMinusCorners, 0f)
+    path.arcTo(left, top, left + 2 * rx, top + 2 * ry, 270f, -90f, false) //top-left corner.
+    path.rLineTo(0f, heightMinusCorners)
+    if (conformToOriginalPost) {
+        path.rLineTo(0f, ry)
+        path.rLineTo(width, 0f)
+        path.rLineTo(0f, -ry)
+    } else {
+        path.arcTo(left, bottom - 2 * ry, left + 2 * rx, bottom, 180f, -90f, false) //bottom-left corner
+        path.rLineTo(widthMinusCorners, 0f)
+        path.arcTo(right - 2 * rx, bottom - 2 * ry, right, bottom, 90f, -90f, false) //bottom-right corner
+    }
+    path.rLineTo(0f, -heightMinusCorners)
+    path.close() //Given close, last lineto can be removed.
+    return path
 }
