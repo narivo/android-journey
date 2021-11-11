@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Crane Clone</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="lorem_ipsum">Create an activity that does the following things:
+
+Sets the content view to be the layout with the ViewPager2.
+Creates a class that extends the FragmentStateAdapter abstract class and implements the createFragment() method to supply instances of ScreenSlidePageFragment as new pages. The pager adapter also requires that you implement the getItemCount() method, which returns the number of pages the adapter will create (five in the example).
+Hooks up the FragmentStateAdapter to the ViewPager2 objects.
+    </string>
+</resources>
