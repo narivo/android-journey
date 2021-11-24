@@ -3,15 +3,24 @@ package com.example.craneclone
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.google.android.material.tabs.TabLayout
+import android.graphics.drawable.BitmapDrawable
+
+import android.graphics.Bitmap
+import android.graphics.drawable.RippleDrawable
+import androidx.core.view.ViewCompat
+import com.google.android.material.ripple.RippleUtils
+
 
 class CraneTabLayout @JvmOverloads constructor(
     context: Context,
@@ -124,37 +133,42 @@ class CraneTabLayout @JvmOverloads constructor(
 }
 
 fun Canvas.drawRoundedRect(left: Float, top: Float, right: Float, bottom: Float, rx: Float, ry: Float, paint: Paint) {
-    val path = roundedRect(left, top, right, bottom, rx, ry, false)
+    val path = roundedRect(left, top, right, bottom, rx, ry)
     this.drawPath(path, paint)
 }
 
-private fun Canvas.roundedRect(left: Float, top: Float, right: Float, bottom: Float, rx: Float, ry: Float, conformToOriginalPost: Boolean): Path {
+private fun Canvas.roundedRect(left: Float, top: Float, right: Float, bottom: Float, rx: Float, ry: Float): Path {
     var rx = rx
     var ry = ry
+
     val path = Path()
     if (rx < 0) rx = 0f
     if (ry < 0) ry = 0f
+
     val width = right - left
     val height = bottom - top
+
     if (rx > width / 2) rx = width / 2
     if (ry > height / 2) ry = height / 2
+
     val widthMinusCorners = width - 2 * rx
     val heightMinusCorners = height - 2 * ry
+
     path.moveTo(right, top + ry)
+
     path.arcTo(right - 2 * rx, top, right, top + 2 * ry, 0f, -90f, false) //top-right-corner
     path.rLineTo(-widthMinusCorners, 0f)
+
     path.arcTo(left, top, left + 2 * rx, top + 2 * ry, 270f, -90f, false) //top-left corner.
     path.rLineTo(0f, heightMinusCorners)
-    if (conformToOriginalPost) {
-        path.rLineTo(0f, ry)
-        path.rLineTo(width, 0f)
-        path.rLineTo(0f, -ry)
-    } else {
-        path.arcTo(left, bottom - 2 * ry, left + 2 * rx, bottom, 180f, -90f, false) //bottom-left corner
-        path.rLineTo(widthMinusCorners, 0f)
-        path.arcTo(right - 2 * rx, bottom - 2 * ry, right, bottom, 90f, -90f, false) //bottom-right corner
-    }
+
+    path.arcTo(left, bottom - 2 * ry, left + 2 * rx, bottom, 180f, -90f, false) //bottom-left corner
+    path.rLineTo(widthMinusCorners, 0f)
+
+    path.arcTo(right - 2 * rx, bottom - 2 * ry, right, bottom, 90f, -90f, false) //bottom-right corner
     path.rLineTo(0f, -heightMinusCorners)
+
     path.close() //Given close, last lineto can be removed.
+
     return path
 }
