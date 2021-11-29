@@ -57,7 +57,9 @@ fun MessageCard(msg: Message) {
                         else MaterialTheme.colors.surface
         )
         
-        Column(modifier = Modifier.clickable { isExpanded = isExpanded.toggle() }) {
+        Column(modifier = Modifier.clickable {
+            isExpanded = isExpanded.toggle()
+        }) {
 
             Text(
                 text = msg.author,
